@@ -1,19 +1,16 @@
 {
-  "minecraftVersion": "1.21.1",
-  "loader": "NeoForge",
-  "mainClass": "net.minecraft.client.main.Main",
-
-  "client": "minecraft.jar",
-  "loaderJar": "neoforge.jar",
-
-  "paths": {
-    "libraries": "libraries/",
-    "mods": "../mods/",
-    "resourcepacks": "../resourcepacks/",
-    "shaderpacks": "../shaderpacks/"
-  },
-
-  "remote": {
-    "base": "https://raw.githubusercontent.com/oqzdhqzdjhqzdkqzjdh-maker/Launcher/main/"
-  }
+    "minecraftVersion": "1.21.1",
+    "loader": "NeoForge",
+    "mainClass": "net.minecraft.client.main.Main",
+    "client": "minecraft.jar",
+    "loaderJar": "neoforge.jar",
+    "paths": {
+        "libraries": "libraries/",
+        "mods": "../mods/",
+        "resourcepacks": "../resourcepacks/",
+        "shaderpacks": "../shaderpacks/"
+    },
+    "remote": {
+        "base": "https://raw.githubusercontent.com/oqzdhqzdjhqzdkqzjdh-maker/Launcher/main/"
+    }
 }
