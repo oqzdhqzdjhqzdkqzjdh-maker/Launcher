@@ -1,1 +1,118 @@
-[]
+[
+    {
+        "name": "mixinextras-neoforge-0.4.1.jar",
+        "path": "libraries/mixinextras-neoforge-0.4.1.jar"
+    },
+    {
+        "name": "loader-4.0.29.jar",
+        "path": "libraries/loader-4.0.29.jar"
+    },
+    {
+        "name": "earlydisplay-4.0.29.jar",
+        "path": "libraries/earlydisplay-4.0.29.jar"
+    },
+    {
+        "name": "securejarhandler-3.0.8.jar",
+        "path": "libraries/securejarhandler-3.0.8.jar"
+    },
+    {
+        "name": "asm-9.7.jar",
+        "path": "libraries/asm-9.7.jar"
+    },
+    {
+        "name": "asm-commons-9.7.jar",
+        "path": "libraries/asm-commons-9.7.jar"
+    },
+    {
+        "name": "asm-tree-9.7.jar",
+        "path": "libraries/asm-tree-9.7.jar"
+    },
+    {
+        "name": "asm-util-9.7.jar",
+        "path": "libraries/asm-util-9.7.jar"
+    },
+    {
+        "name": "asm-analysis-9.7.jar",
+        "path": "libraries/asm-analysis-9.7.jar"
+    },
+    {
+        "name": "accesstransformers-10.0.1.jar",
+        "path": "libraries/accesstransformers-10.0.1.jar"
+    },
+    {
+        "name": "bus-8.0.2.jar",
+        "path": "libraries/bus-8.0.2.jar"
+    },
+    {
+        "name": "coremods-7.0.3.jar",
+        "path": "libraries/coremods-7.0.3.jar"
+    },
+    {
+        "name": "modlauncher-11.0.4.jar",
+        "path": "libraries/modlauncher-11.0.4.jar"
+    },
+    {
+        "name": "mergetool-2.0.3.jar",
+        "path": "libraries/mergetool-2.0.3.jar"
+    },
+    {
+        "name": "core-3.8.0.jar",
+        "path": "libraries/core-3.8.0.jar"
+    },
+    {
+        "name": "toml-3.8.0.jar",
+        "path": "libraries/toml-3.8.0.jar"
+    },
+    {
+        "name": "maven-artifact-3.8.5.jar",
+        "path": "libraries/maven-artifact-3.8.5.jar"
+    },
+    {
+        "name": "typetools-0.6.3.jar",
+        "path": "libraries/typetools-0.6.3.jar"
+    },
+    {
+        "name": "terminalconsoleappender-1.3.0.jar",
+        "path": "libraries/terminalconsoleappender-1.3.0.jar"
+    },
+    {
+        "name": "sponge-mixin-0.15.2+mixin.0.8.7.jar",
+        "path": "libraries/sponge-mixin-0.15.2+mixin.0.8.7.jar"
+    },
+    {
+        "name": "nashorn-core-15.4.jar",
+        "path": "libraries/nashorn-core-15.4.jar"
+    },
+    {
+        "name": "JarJarSelector-0.4.1.jar",
+        "path": "libraries/JarJarSelector-0.4.1.jar"
+    },
+    {
+        "name": "commons-lang3-3.14.0.jar",
+        "path": "libraries/commons-lang3-3.14.0.jar"
+    },
+    {
+        "name": "JarJarMetadata-0.4.1.jar",
+        "path": "libraries/JarJarMetadata-0.4.1.jar"
+    },
+    {
+        "name": "log4j-api-2.22.1.jar",
+        "path": "libraries/log4j-api-2.22.1.jar"
+    },
+    {
+        "name": "log4j-core-2.22.1.jar",
+        "path": "libraries/log4j-core-2.22.1.jar"
+    },
+    {
+        "name": "bootstraplauncher-2.0.2.jar",
+        "path": "libraries/bootstraplauncher-2.0.2.jar"
+    },
+    {
+        "name": "JarJarFileSystems-0.4.1.jar",
+        "path": "libraries/JarJarFileSystems-0.4.1.jar"
+    },
+    {
+        "name": "junit-fml-4.0.29.jar",
+        "path": "libraries/junit-fml-4.0.29.jar"
+    }
+]

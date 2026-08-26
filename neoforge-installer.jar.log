@@ -1,0 +1,12 @@
+JVM info: Oracle Corporation - 21.0.10 - 21.0.10+8-LTS-217
+java.net.preferIPv4Stack=true
+Current Time: 26/08/2026 16:07:14
+Host: maven.neoforged.net [185.93.2.9, 79.127.178.162, 79.127.178.53, 185.93.2.11, 79.127.178.57, 79.127.178.168]
+Host: libraries.minecraft.net [150.171.109.35]
+Host: launchermeta.mojang.com [150.171.109.34]
+Host: piston-meta.mojang.com [150.171.109.35]
+Host: sessionserver.mojang.com [150.171.110.117]
+Found java version 21.0.10
+Target Directory: instance\neoforge_build
+There is no minecraft launcher profile in "instance\neoforge_build", you need to run the launcher first!
+There was an error during installation

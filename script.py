@@ -1,150 +1,132 @@
 import os
 import json
-import hashlib
-import zipfile
+import urllib.request
+import xml.etree.ElementTree as ET
 
-DIRS = {
-    "mods": {
-        "needed": "mods/needed",
-        "bonus": "mods/bonus"
+MC_VERSION = "1.21.1"
+NEOFORGE_VERSION = "21.1.72"
+
+INSTANCE_DIR = "instance"
+LIB_DIR = os.path.join(INSTANCE_DIR, "libraries")
+
+def ensure(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+def download(url, path):
+    print(f"[DL] {url}")
+    urllib.request.urlretrieve(url, path)
+    print(f"[OK] -> {path}")
+
+# -----------------------------
+# 1. Préparation des dossiers
+# -----------------------------
+ensure(INSTANCE_DIR)
+ensure(LIB_DIR)
+
+# -----------------------------
+# 2. Télécharger Minecraft
+# -----------------------------
+print("[INFO] Récupération du manifest Minecraft…")
+
+VERSION_MANIFEST = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
+manifest_path = os.path.join(INSTANCE_DIR, "version_manifest.json")
+download(VERSION_MANIFEST, manifest_path)
+
+with open(manifest_path, "r") as f:
+    manifest = json.load(f)
+
+version_url = next(v["url"] for v in manifest["versions"] if v["id"] == MC_VERSION)
+
+version_manifest_path = os.path.join(INSTANCE_DIR, "version.json")
+download(version_url, version_manifest_path)
+
+with open(version_manifest_path, "r") as f:
+    version_data = json.load(f)
+
+client_url = version_data["downloads"]["client"]["url"]
+minecraft_path = os.path.join(INSTANCE_DIR, "minecraft.jar")
+download(client_url, minecraft_path)
+
+# -----------------------------
+# 3. Télécharger NeoForge universal (runtime)
+# -----------------------------
+print("[INFO] Téléchargement du runtime NeoForge…")
+
+NEOFORGE_BASE = f"https://maven.neoforged.net/releases/net/neoforged/neoforge/{NEOFORGE_VERSION}/"
+
+runtime_url = NEOFORGE_BASE + f"neoforge-{NEOFORGE_VERSION}-universal.jar"
+runtime_path = os.path.join(INSTANCE_DIR, "neoforge.jar")
+download(runtime_url, runtime_path)
+
+# -----------------------------
+# 4. Télécharger le POM NeoForge
+# -----------------------------
+pom_url = NEOFORGE_BASE + f"neoforge-{NEOFORGE_VERSION}.pom"
+pom_path = os.path.join(INSTANCE_DIR, "neoforge.pom")
+download(pom_url, pom_path)
+
+# -----------------------------
+# 5. Lire le POM et télécharger les libraries
+# -----------------------------
+print("[INFO] Téléchargement des libraries NeoForge…")
+
+tree = ET.parse(pom_path)
+root = tree.getroot()
+
+ns = {"m": "http://maven.apache.org/POM/4.0.0"}
+
+libs = []
+
+for dep in root.findall("m:dependencies/m:dependency", ns):
+    group = dep.find("m:groupId", ns).text.replace(".", "/")
+    artifact = dep.find("m:artifactId", ns).text
+    version = dep.find("m:version", ns).text
+
+    lib_url = f"https://maven.neoforged.net/releases/{group}/{artifact}/{version}/{artifact}-{version}.jar"
+    lib_path = os.path.join(LIB_DIR, f"{artifact}-{version}.jar")
+
+    try:
+        download(lib_url, lib_path)
+        libs.append({"name": f"{artifact}-{version}.jar", "path": f"libraries/{artifact}-{version}.jar"})
+    except:
+        print(f"[WARN] Impossible de télécharger {artifact}-{version}.jar")
+
+# -----------------------------
+# 6. Générer libraries.json
+# -----------------------------
+with open(os.path.join(INSTANCE_DIR, "libraries.json"), "w") as f:
+    json.dump(libs, f, indent=4)
+
+# -----------------------------
+# 7. Générer instance.json
+# -----------------------------
+instance_json = {
+    "minecraftVersion": MC_VERSION,
+    "loader": "NeoForge",
+    "mainClass": "net.minecraft.client.main.Main",
+
+    "client": "minecraft.jar",
+    "loaderJar": "neoforge.jar",
+
+    "paths": {
+        "libraries": "libraries/",
+        "mods": "../mods/",
+        "resourcepacks": "../resourcepacks/",
+        "shaderpacks": "../shaderpacks/"
+    },
+
+    "remote": {
+        "base": "https://raw.githubusercontent.com/oqzdhqzdjhqzdkqzjdh-maker/Launcher/main/"
     }
 }
 
-OUTPUT_FILE = "manifest.json"
+with open(os.path.join(INSTANCE_DIR, "instance.json"), "w") as f:
+    json.dump(instance_json, f, indent=4)
 
-def sha256_file(path):
-    with open(path, "rb") as f:
-        return hashlib.sha256(f.read()).hexdigest()
-
-def extract_mixins_metadata(z):
-    """Scan the jar for any *.mixins.json file."""
-    for name in z.namelist():
-        if name.lower().endswith(".mixins.json"):
-            try:
-                data = json.loads(z.read(name))
-                modid = name.lower().replace(".mixins.json", "").split("/")[-1]
-                return {
-                    "package": data.get("package", ""),
-                    "modid": modid,
-                    "description": data.get("refmap", "").replace(".refmap.json", "")
-                }
-            except:
-                continue
-    return {"package": "", "modid": "", "description": ""}
-
-def extract_metadata(path):
-    version = "unknown"
-    description = ""
-    package = ""
-    modid = ""
-    displayName = ""
-    authors = []
-
-    try:
-        with zipfile.ZipFile(path, "r") as z:
-            names = z.namelist()
-
-            # NeoForge 1.21.1 metadata
-            if "META-INF/neoforge.mods.toml" in names:
-                raw = z.read("META-INF/neoforge.mods.toml").decode("utf-8")
-                for line in raw.splitlines():
-                    line = line.strip()
-                    if line.startswith("modId"):
-                        modid = line.split("=")[1].strip().replace('"', "")
-                    if line.startswith("displayName"):
-                        displayName = line.split("=")[1].strip().replace('"', "")
-                    if line.startswith("authors"):
-                        authors = [line.split("=")[1].strip().replace('"', "")]
-                    if line.startswith("version"):
-                        version = line.split("=")[1].strip().replace('"', "")
-                    if line.startswith("description"):
-                        description = line.split("=")[1].strip().replace('"', "")
-
-            # Forge / NeoForge older
-            elif "META-INF/mods.toml" in names:
-                raw = z.read("META-INF/mods.toml").decode("utf-8")
-                for line in raw.splitlines():
-                    line = line.strip()
-                    if line.startswith("modId"):
-                        modid = line.split("=")[1].strip().replace('"', "")
-                    if line.startswith("displayName"):
-                        displayName = line.split("=")[1].strip().replace('"', "")
-                    if line.startswith("authors"):
-                        authors = [line.split("=")[1].strip().replace('"', "")]
-                    if line.startswith("version"):
-                        version = line.split("=")[1].strip().replace('"', "")
-                    if line.startswith("description"):
-                        description = line.split("=")[1].strip().replace('"', "")
-
-            # Fabric
-            elif "fabric.mod.json" in names:
-                data = json.loads(z.read("fabric.mod.json"))
-                modid = data.get("id", modid)
-                displayName = data.get("name", displayName)
-                authors = data.get("authors", authors)
-                version = data.get("version", version)
-                description = data.get("description", description)
-
-            # Old Forge
-            elif "mcmod.info" in names:
-                data = json.loads(z.read("mcmod.info"))
-                if isinstance(data, list) and len(data) > 0:
-                    modid = data[0].get("modid", modid)
-                    displayName = data[0].get("name", displayName)
-                    authors = data[0].get("authorList", authors)
-                    version = data[0].get("version", version)
-                    description = data[0].get("description", description)
-
-            # Mixins JSON fallback
-            mixin_meta = extract_mixins_metadata(z)
-            if mixin_meta["package"]:
-                package = mixin_meta["package"]
-            if mixin_meta["modid"] and not modid:
-                modid = mixin_meta["modid"]
-            if mixin_meta["description"] and not description:
-                description = mixin_meta["description"]
-
-    except Exception:
-        pass
-
-    return version, description, package, modid, displayName, authors
-
-def scan_mods():
-    items = []
-
-    for needed_flag, folder in [("needed", DIRS["mods"]["needed"]), ("bonus", DIRS["mods"]["bonus"])]:
-        if os.path.isdir(folder):
-            for file in os.listdir(folder):
-                if file.endswith(".jar"):
-                    full_path = os.path.join(folder, file)
-
-                    version, description, package, modid, displayName, authors = extract_metadata(full_path)
-
-                    items.append({
-                        "name": file,
-                        "sha256": sha256_file(full_path),
-                        "size": os.path.getsize(full_path),
-                        "version": version,
-                        "package": package,
-                        "description": description if description else "unknown",
-                        "modid": modid,
-                        "displayName": displayName,
-                        "authors": authors,
-                        "needed": (needed_flag == "needed")
-                    })
-
-    return items
-
-def main():
-    manifest = {
-        "mods": scan_mods()
-    }
-
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(manifest, f, indent=4)
-
-    print("✔ Manifest généré :", OUTPUT_FILE)
-    print("✔ Mods :", len(manifest["mods"]))
-
-if __name__ == "__main__":
-    main()
+print("\n✔ Instance NeoForge 1.21.1 générée avec succès.")
+print("✔ minecraft.jar OK")
+print("✔ neoforge.jar OK")
+print("✔ libraries OK")
+print("✔ libraries.json OK")
+print("✔ instance.json OK")
