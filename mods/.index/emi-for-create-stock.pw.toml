@@ -1,0 +1,27 @@
+filename = 'emiforcreatestock-1.0.8.jar'
+name = 'EMI For Create Stock'
+side = 'client'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1', '1.21.1' ]
+x-prismlauncher-release-type = 'beta'
+x-prismlauncher-version-number = '1.0.8'
+
+[download]
+hash = '135d6efacf744cb379d2e01c30d7a0b70c625ef703a5c4b0d2a2d71b185cc5ee0060be1a0ec41b89d521f23640e20e7dc1f352bafbba5c64c8026322ce83e3d0'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/5Ez0Fy6f/versions/3WKi30ug/emiforcreatestock-1.0.8.jar'
+
+[update.modrinth]
+mod-id = '5Ez0Fy6f'
+version = '3WKi30ug'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'fRiHVvU7'
+type = 'REQUIRED'
+version = '5sIPA1To'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'LNytGWDc'
+type = 'REQUIRED'
+version = 'n7NADxiG'
